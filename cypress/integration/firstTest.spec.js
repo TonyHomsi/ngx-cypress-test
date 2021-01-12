@@ -1,5 +1,7 @@
 /// <reference types="cypress" />
 
+const { lab } = require("d3-color")
+
 describe('Our first suite', ()=> {
     it('first test', ()=> {
 
@@ -65,7 +67,7 @@ describe('Our first suite', ()=> {
         cy.contains('nb-card','Horizontal form').find('[type="email"]')
     })
 
-    it.only('then and wrap methods', ()=>{
+    it('then and wrap methods', ()=>{
         cy.visit('/')
         cy.contains('Forms').click()
         cy.contains('Form Layouts').click()
@@ -92,7 +94,7 @@ describe('Our first suite', ()=> {
                 // expect(passwordLabelSecond).to.equal('Password')
                 expect(passwordLabelFirst).to.equal(passwordLabelSecond)
 
-
+                // Convert your code from JjQuery format to Cypress
                 cy.wrap(secondForm).find('[for="exampleInputPassword1"]').should('contain','Password')
             })
 
@@ -100,5 +102,50 @@ describe('Our first suite', ()=> {
         })
 
         
+    })
+
+    it('invoke command', ()=> {
+        cy.visit('/')
+        cy.contains('Forms').click()
+        cy.contains('Form Layouts').click()
+
+        //1
+        cy.get('[for="exampleInputEmail1"]').should('contain','Email address')
+
+        //2
+        cy.get('[for="exampleInputEmail1"]').then( label => {
+            expect(label.text()).to.equal('Email address')
+
+        })
+
+        //3
+        cy.get('[for="exampleInputEmail1"]').invoke('text').then( text =>{
+            expect(text).to.equal('Email address')
+        })
+
+        // In order to check the checkbox
+
+        cy.contains('nb-card', 'Basic form')
+            .find('nb-checkbox')
+            .click()
+            .find('.custom-checkbox')
+            .invoke('attr', 'class')
+            //.should('contain','checked')
+            .then(classValue => {
+                expect(classValue).to.contain('checked') // calssValue is extracted value from the invoked function
+            })
+
+    })
+
+    it.only('assert property', () =>{
+        cy.visit('/')
+        cy.contains('Forms').click()
+        cy.contains('Datepicker').click()
+
+        cy.contains('nb-card','Common Datepicker').find('input').then( input =>{
+            cy.wrap(input).click()
+            cy.get('nb-calendar-day-picker').contains('30').click()
+            cy.wrap(input).invoke('prop','value').should('contain','Dec 30, 2020')
+        })
     })
 })
