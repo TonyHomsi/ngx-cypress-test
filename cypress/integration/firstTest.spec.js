@@ -137,15 +137,34 @@ describe('Our first suite', ()=> {
 
     })
 
+    // Web Datepicker
     it('assert property', () =>{
         cy.visit('/')
         cy.contains('Forms').click()
         cy.contains('Datepicker').click()
 
+        function selectDayFromCurrent(day){
+            let date = new Date()
+            date.setDate(date.getDate() + day)
+            let futureDay = date.getDate()
+            let futureMonth = date.toLocaleString('default', {month: 'short'})
+            let dateAssert = futureMonth+' '+futureDay+', '+date.getFullYear()
+    
+            cy.get('nb-calendar-navigation').invoke('attr', 'ng-reflect-date').then( dateAttibute => {
+                if(!dateAttibute.includes(futureMonth)){
+                    cy.get('[data-name="chevron-right"]').click()
+                    selectDayFromCurrent(day)    
+                }else{
+                    cy.get('nb-calendar-day-picker [class="day-cell ng-star-inserted"]').contains(futureDay).click()
+                }
+            })
+            return dateAssert
+        }
+
         cy.contains('nb-card','Common Datepicker').find('input').then( input =>{
             cy.wrap(input).click()
-            cy.get('nb-calendar-day-picker').contains('30').click()
-            cy.wrap(input).invoke('prop','value').should('contain','Dec 30, 2020')
+            let dateAssert = selectDayFromCurrent(40)
+            cy.wrap(input).invoke('prop','value').should('contain',dateAssert)
         })
     })
 
@@ -224,7 +243,7 @@ describe('Our first suite', ()=> {
 
     })
 
-    it.only('Web tables', ()=>{
+    it('Web tables', ()=>{
         cy.visit('/')
         cy.contains('Tables & Data').click()
         cy.contains('Smart Table').click()
@@ -265,6 +284,43 @@ describe('Our first suite', ()=> {
                 }
             })
       })
+
+    })
+
+
+    it('tooltip', ()=>{
+        cy.visit('/')
+        cy.contains('Modal & Overlays').click()
+        cy.contains('Tooltip').click()
+
+        cy.contains('nb-card', 'Colored Tooltips')
+            .contains('Default').click()
+        cy.get('nb-tooltip').should('contain', 'This is a tooltip')
+    })
+
+    it.only('dilog Box', ()=>{
+        cy.visit('/')
+        cy.contains('Tables & Data').click()
+        cy.contains('Smart Table').click()
+
+
+        // 1 don't use it
+        // cy.get('tbody tr').first().find('.nb-trash').click()
+        // Will not failed and It will work when the event is fired for the line code expect().to.equal(..)
+        //cy.on('window:cofirm', (cofirm) =>{
+         //   expect(confirm).to.equal('Are you sure you want to delete?')
+        // })
+
+        // 2 better solution
+        const stub = cy.stub()
+        cy.on('window:confirm', stub)
+        cy.get('tbody tr').first().find('.nb-trash').click().then(() =>{
+            expect(stub.getCall(0)).to.be.calledWith('Are you sure you want to delete?')
+        })
+
+        // 3 how to select cancel for these type of the dialog boxes
+        cy.get('tbody tr').first().find('.nb-trash').click()
+        cy.on('window:cofirm', () => false)
 
     })
 
