@@ -144,9 +144,6 @@ describe('Our first suite', ()=> {
 
     // Web Datepicker
     it.only('assert property', () =>{
-        cy.visit('/')
-        cy.contains('Forms').click()
-        cy.contains('Datepicker').click()
 
         function selectDayFromCurrent(day){
             let date = new Date()
@@ -165,6 +162,10 @@ describe('Our first suite', ()=> {
             })
             return dateAssert
         }
+
+        cy.visit('/')
+        cy.contains('Forms').click()
+        cy.contains('Datepicker').click()
 
         cy.contains('nb-card','Common Datepicker').find('input').then( input =>{
             cy.wrap(input).click()

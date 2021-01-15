@@ -1,4 +1,4 @@
-// import { ExpandOperator } from "rxjs/internal/operators/expand";
+import { ExpandOperator } from "rxjs/internal/operators/expand";
 
 function selectGroupMenuItem(groupName){
     cy.contains('a', groupName).then( menu =>{
